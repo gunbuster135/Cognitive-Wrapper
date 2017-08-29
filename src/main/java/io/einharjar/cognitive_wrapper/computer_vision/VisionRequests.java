@@ -12,17 +12,11 @@ import java.net.URL;
 
 
 public class VisionRequests {
-    private String BASE_URL;
-    private HttpUrl ANALYZE_ENDPOINT;
-    private String apiKey;
+    private ApiSettings apiSettings;
 
-    public VisionRequests(String location, String version, String apiKey) throws MalformedURLException {
-        ObjectHelper.checkString(location, "Location  cannot be null or empty");
-        ObjectHelper.checkString(version, "Version cannot be null or empty");
-        ObjectHelper.checkString(apiKey, "API key cannot be null or empty");
-        BASE_URL = location + "/vision/" + version;
-        this.apiKey = apiKey;
-        this.ANALYZE_ENDPOINT = HttpUrl.get(new URL(BASE_URL + "/analyze"));
+    public VisionRequests(ApiSettings apiSettings) throws MalformedURLException {
+        ObjectHelper.checkNull(apiSettings);
+        this.apiSettings = apiSettings;
     }
 
     //For URL
@@ -31,7 +25,7 @@ public class VisionRequests {
 
         return new Request.Builder()
                 .addHeader("Content-Type", "multipart/form-data")
-                .addHeader("Ocp-Apim-Subscription-Key", apiKey)
+                .addHeader("Ocp-Apim-Subscription-Key", apiSettings.getApiKey())
                 .url(createHttpUrlAnalyze(visionAnalyzeRequest))
                 .post(RequestBody.create(MediaType.parse("application/json"), Mapper.getInstance().write(urlObj)))
                 .build();
@@ -47,14 +41,14 @@ public class VisionRequests {
                 .build();
         return new Request.Builder()
                 .addHeader("Content-Type", "multipart/form-data")
-                .addHeader("Ocp-Apim-Subscription-Key", apiKey)
+                .addHeader("Ocp-Apim-Subscription-Key", apiSettings.getApiKey())
                 .url(createHttpUrlAnalyze(visionAnalyzeRequest))
                 .post(body)
                 .build();
     }
 
     private HttpUrl createHttpUrlAnalyze(VisionAnalyzeRequest visionAnalyzeRequest) {
-        HttpUrl.Builder builder = ANALYZE_ENDPOINT.newBuilder();
+        HttpUrl.Builder builder = createAnalyzeEndpointUrl().newBuilder();
         if (visionAnalyzeRequest.getVisualFeatures() != null) {
             builder.addQueryParameter(
                     "visualFeatures", StringUtils.join(visionAnalyzeRequest.getVisualFeatures(), ',')
@@ -73,5 +67,17 @@ public class VisionRequests {
         }
         System.out.println(builder.build()); // remove
         return builder.build();
+    }
+
+    private String createBaseUrl() {
+        return apiSettings.getLocation() + "/vision/" + apiSettings.getVersion();
+    }
+
+    private HttpUrl createAnalyzeEndpointUrl() {
+        try {
+            return HttpUrl.get(new URL(createBaseUrl() + "/analyze"));
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("Malformed url produced with following API Settings = " + apiSettings.toString());
+        }
     }
 }

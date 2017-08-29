@@ -7,6 +7,7 @@ import io.einharjar.cognitive_wrapper.computer_vision.response.VisionAnalyzeResp
 import io.einharjar.cognitive_wrapper.utils.Mapper;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -16,9 +17,9 @@ public class VisionClient {
     private VisionRequests visionRequests;
     private OkHttpClient client;
 
-    public VisionClient(String location, String version, String apiKey, OkHttpClient client) throws MalformedURLException {
+    public VisionClient(ApiSettings apiSettings, OkHttpClient client) throws MalformedURLException {
         this.client = client;
-        visionRequests = new VisionRequests(location, version, apiKey);
+        visionRequests = new VisionRequests(apiSettings);
     }
 
     public VisionAnalyzeResponse imageAnalyze(VisionAnalyzeRequest request, byte[] image) throws ApiException, IOException {
@@ -28,7 +29,6 @@ public class VisionClient {
         } else if (response.code() == 400 || response.code() == 415 || response.code() == 500) {
             throw new ApiException(Mapper.getInstance().read(response.body().string(), ResponseError.class));
         }
-
         return new VisionAnalyzeResponse();
     }
 

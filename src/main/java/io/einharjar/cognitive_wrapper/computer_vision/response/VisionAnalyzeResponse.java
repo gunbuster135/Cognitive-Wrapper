@@ -2,6 +2,7 @@ package io.einharjar.cognitive_wrapper.computer_vision.response;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -145,14 +146,37 @@ public class VisionAnalyzeResponse {
         private Boolean isBWImg;
     }
 
-    //TODO: Handle as enums instead of integers
     @NoArgsConstructor
     @AllArgsConstructor
     @Data
     private static class ImageType {
         @JsonProperty("clipArtType")
-        private Integer clipArtType;
+        private ClipartType clipArtType;
         @JsonProperty("lineDrawingType")
-        private Integer lineDrawingType;
+        private LineDrawingType lineDrawingType;
+
+
+        public enum ClipartType {
+            NonClipart,
+            Ambigious,
+            NormalClipart,
+            GoodClipart;
+
+            @JsonValue
+            public int toValue() {
+                return ordinal();
+            }
+        }
+
+        public enum LineDrawingType {
+            NonLineDrawing,
+            LineDrawing;
+
+            @JsonValue
+            public int toValue() {
+                return ordinal();
+            }
+        }
     }
+
 }
