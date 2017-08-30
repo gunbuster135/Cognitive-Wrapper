@@ -1,6 +1,6 @@
 package io.einharjar.cognitive_wrapper.computer_vision.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import io.einharjar.cognitive_wrapper.computer_vision.domain.VisualFeature;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,11 +22,4 @@ public class VisionAnalyzeRequest {
     private List<String> details;
     private String language;
 
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Data
-    public static class URLBody {
-        @JsonProperty("url")
-        private String url;
-    }
 }

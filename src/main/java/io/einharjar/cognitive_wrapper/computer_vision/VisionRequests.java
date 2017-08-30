@@ -1,6 +1,7 @@
 package io.einharjar.cognitive_wrapper.computer_vision;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.einharjar.cognitive_wrapper.computer_vision.request.UrlRequest;
 import io.einharjar.cognitive_wrapper.computer_vision.request.VisionAnalyzeRequest;
 import io.einharjar.cognitive_wrapper.utils.Mapper;
 import io.einharjar.cognitive_wrapper.utils.ObjectHelper;
@@ -21,7 +22,7 @@ public class VisionRequests {
 
     //For URL
     public Request analyzeRequest(VisionAnalyzeRequest visionAnalyzeRequest, String url) throws JsonProcessingException {
-        VisionAnalyzeRequest.URLBody urlObj = new VisionAnalyzeRequest.URLBody(url);
+        UrlRequest urlObj = new UrlRequest(url);
 
         return new Request.Builder()
                 .addHeader("Content-Type", "multipart/form-data")

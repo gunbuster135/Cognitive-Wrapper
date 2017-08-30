@@ -1,4 +1,4 @@
-package io.einharjar.cognitive_wrapper.computer_vision.request;
+package io.einharjar.cognitive_wrapper.computer_vision.domain;
 
 /**
  * Created by omar on 2017-08-18.
