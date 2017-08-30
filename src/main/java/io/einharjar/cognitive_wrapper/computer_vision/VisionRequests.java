@@ -15,7 +15,7 @@ public class VisionRequests {
     private ApiSettings apiSettings;
 
     public VisionRequests(ApiSettings apiSettings) throws MalformedURLException {
-        ObjectHelper.checkNull(apiSettings);
+        ObjectHelper.checkNull(apiSettings, "API Settings cannot be null!");
         this.apiSettings = apiSettings;
     }
 
@@ -49,23 +49,24 @@ public class VisionRequests {
 
     private HttpUrl createHttpUrlAnalyze(VisionAnalyzeRequest visionAnalyzeRequest) {
         HttpUrl.Builder builder = createAnalyzeEndpointUrl().newBuilder();
-        if (visionAnalyzeRequest.getVisualFeatures() != null) {
-            builder.addQueryParameter(
-                    "visualFeatures", StringUtils.join(visionAnalyzeRequest.getVisualFeatures(), ',')
-            );
-        }
-        if (visionAnalyzeRequest.getDetails() != null) {
-            builder.addQueryParameter(
-                    "details", StringUtils.join(visionAnalyzeRequest.getDetails(), ',')
-            );
-        }
+        if (visionAnalyzeRequest != null) {
+            if (visionAnalyzeRequest.getVisualFeatures() != null) {
+                builder.addQueryParameter(
+                        "visualFeatures", StringUtils.join(visionAnalyzeRequest.getVisualFeatures(), ',')
+                );
+            }
+            if (visionAnalyzeRequest.getDetails() != null) {
+                builder.addQueryParameter(
+                        "details", StringUtils.join(visionAnalyzeRequest.getDetails(), ',')
+                );
+            }
 
-        if (visionAnalyzeRequest.getLanguage() != null) {
-            builder.addQueryParameter(
-                    "language", visionAnalyzeRequest.getLanguage()
-            );
+            if (visionAnalyzeRequest.getLanguage() != null) {
+                builder.addQueryParameter(
+                        "language", visionAnalyzeRequest.getLanguage()
+                );
+            }
         }
-        System.out.println(builder.build()); // remove
         return builder.build();
     }
 
