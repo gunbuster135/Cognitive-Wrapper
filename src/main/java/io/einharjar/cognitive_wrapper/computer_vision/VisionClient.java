@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-@SuppressWarnings("Duplicates")
 public class VisionClient {
     private VisionRequests visionRequests;
     private OkHttpClient client;
@@ -36,12 +35,7 @@ public class VisionClient {
 
     public VisionAnalyzeResponse imageAnalyze(VisionAnalyzeRequest request, byte[] image) throws ApiException, IOException {
         Response response = client.newCall(visionRequests.analyzeRequest(request, image)).execute();
-        if (response.isSuccessful() && response.body() != null) {
-            return Mapper.getInstance().read(response.body().string(), VisionAnalyzeResponse.class);
-        } else if (response.code() == 400 || response.code() == 415 || response.code() == 500) {
-            throw new ApiException(Mapper.getInstance().read(response.body().string(), ResponseError.class));
-        }
-        return new VisionAnalyzeResponse();
+        return handleResponse(response, VisionAnalyzeResponse.class);
     }
 
     public VisionAnalyzeResponse imageAnalyze(VisionAnalyzeRequest request, URL url) throws IOException, ApiException {
@@ -50,12 +44,7 @@ public class VisionClient {
 
     public VisionAnalyzeResponse imageAnalyze(VisionAnalyzeRequest request, String url) throws IOException, ApiException {
         Response response = client.newCall(visionRequests.analyzeRequest(request, url)).execute();
-        if (response.isSuccessful() && response.body() != null) {
-            return Mapper.getInstance().read(response.body().string(), VisionAnalyzeResponse.class);
-        } else if (response.code() == 400 || response.code() == 415 || response.code() == 500) {
-            throw new ApiException(Mapper.getInstance().read(response.body().string(), ResponseError.class));
-        }
-        return new VisionAnalyzeResponse();
+        return handleResponse(response, VisionAnalyzeResponse.class);
     }
 
     public DescribeImageResponse describeImage(int maxCandidates, BufferedImage image) throws IOException, ApiException {
@@ -69,12 +58,7 @@ public class VisionClient {
 
     public DescribeImageResponse describeImage(int maxCandidates, byte[] image) throws ApiException, IOException {
         Response response = client.newCall(visionRequests.describeRequest(maxCandidates, image)).execute();
-        if (response.isSuccessful() && response.body() != null) {
-            return Mapper.getInstance().read(response.body().string(), DescribeImageResponse.class);
-        } else if (response.code() == 400 || response.code() == 415 || response.code() == 500) {
-            throw new ApiException(Mapper.getInstance().read(response.body().string(), ResponseError.class));
-        }
-        return new DescribeImageResponse();
+        return handleResponse(response, DescribeImageResponse.class);
     }
 
     public DescribeImageResponse describeImage(int maxCandidates, URL url) throws IOException, ApiException {
@@ -83,11 +67,17 @@ public class VisionClient {
 
     public DescribeImageResponse describeImage(int maxCandidates, String url) throws IOException, ApiException {
         Response response = client.newCall(visionRequests.describeRequest(maxCandidates, url)).execute();
+        return handleResponse(response, DescribeImageResponse.class);
+    }
+
+    //Generic response handler
+    private <T> T handleResponse(Response response, Class<T> responseClass) throws ApiException, IOException {
         if (response.isSuccessful() && response.body() != null) {
-            return Mapper.getInstance().read(response.body().string(), DescribeImageResponse.class);
+            return Mapper.getInstance().read(response.body().string(), responseClass);
         } else if (response.code() == 400 || response.code() == 415 || response.code() == 500) {
             throw new ApiException(Mapper.getInstance().read(response.body().string(), ResponseError.class));
+        } else {
+            return null;
         }
-        return new DescribeImageResponse();
     }
 }
