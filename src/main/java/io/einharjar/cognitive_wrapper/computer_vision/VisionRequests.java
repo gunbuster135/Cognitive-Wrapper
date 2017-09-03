@@ -21,20 +21,17 @@ public class VisionRequests {
     }
 
     //For URL
-    public Request analyzeRequest(VisionAnalyzeRequest visionAnalyzeRequest, String url) throws JsonProcessingException {
-        UrlRequest urlObj = new UrlRequest(url);
-
+    public Request analyzeRequest(VisionAnalyzeRequest visionAnalyzeRequest, String url) throws JsonProcessingException, MalformedURLException {
         return new Request.Builder()
                 .addHeader("Content-Type", "multipart/form-data")
                 .addHeader("Ocp-Apim-Subscription-Key", apiSettings.getApiKey())
-                .url(createHttpUrlAnalyze(visionAnalyzeRequest))
-                .post(RequestBody.create(MediaType.parse("application/json"), Mapper.getInstance().write(urlObj)))
+                .url(createAnalyzeEndpointUrl(visionAnalyzeRequest))
+                .post(createUrlbody(url))
                 .build();
-
     }
 
     //Without url
-    public Request analyzeRequest(VisionAnalyzeRequest visionAnalyzeRequest, byte[] image) {
+    public Request analyzeRequest(VisionAnalyzeRequest visionAnalyzeRequest, byte[] image) throws MalformedURLException {
         RequestBody body = new MultipartBody.Builder()
                 .addPart(
                         RequestBody.create(MediaType.parse("multipart/form-data"), image)
@@ -43,13 +40,41 @@ public class VisionRequests {
         return new Request.Builder()
                 .addHeader("Content-Type", "multipart/form-data")
                 .addHeader("Ocp-Apim-Subscription-Key", apiSettings.getApiKey())
-                .url(createHttpUrlAnalyze(visionAnalyzeRequest))
+                .url(createAnalyzeEndpointUrl(visionAnalyzeRequest))
                 .post(body)
                 .build();
     }
 
-    private HttpUrl createHttpUrlAnalyze(VisionAnalyzeRequest visionAnalyzeRequest) {
-        HttpUrl.Builder builder = createAnalyzeEndpointUrl().newBuilder();
+    public Request describeRequest(int maxCandidates, byte[] image) throws MalformedURLException {
+        RequestBody body = createImageBody(image);
+        return new Request.Builder()
+                .addHeader("Content-Type", "multipart/form-data")
+                .addHeader("Ocp-Apim-Subscription-Key", apiSettings.getApiKey())
+                .url(createDescribeEndpointUrl(maxCandidates))
+                .post(body)
+                .build();
+    }
+
+    public Request describeRequest(int maxCandidates, String url) throws JsonProcessingException, MalformedURLException {
+        return new Request.Builder()
+                .addHeader("Content-Type", "multipart/form-data")
+                .addHeader("Ocp-Apim-Subscription-Key", apiSettings.getApiKey())
+                .url(createDescribeEndpointUrl(maxCandidates))
+                .post(createUrlbody(url))
+                .build();
+    }
+
+
+    private String createBaseUrl() {
+        return apiSettings.getLocation() + "/vision/" + apiSettings.getVersion();
+    }
+
+    private HttpUrl createAnalyzeEndpointUrl(VisionAnalyzeRequest visionAnalyzeRequest) throws MalformedURLException {
+        HttpUrl httpUrl = HttpUrl.get(new URL(createBaseUrl() + "/analyze"));
+        if (httpUrl == null) {
+            throw new IllegalArgumentException("Invalid URL");
+        }
+        HttpUrl.Builder builder = httpUrl.newBuilder();
         if (visionAnalyzeRequest != null) {
             if (visionAnalyzeRequest.getVisualFeatures() != null) {
                 builder.addQueryParameter(
@@ -71,15 +96,27 @@ public class VisionRequests {
         return builder.build();
     }
 
-    private String createBaseUrl() {
-        return apiSettings.getLocation() + "/vision/" + apiSettings.getVersion();
+    private HttpUrl createDescribeEndpointUrl(int maxCandidates) throws MalformedURLException {
+        HttpUrl httpUrl = HttpUrl.get(new URL(createBaseUrl() + "/describe"));
+        if (httpUrl == null) {
+            throw new IllegalArgumentException("Invalid URL");
+        }
+        HttpUrl.Builder builder = httpUrl.newBuilder();
+        if (maxCandidates > 1) {
+            builder.addQueryParameter("maxCandidates", String.valueOf(maxCandidates));
+        }
+        return builder.build();
     }
 
-    private HttpUrl createAnalyzeEndpointUrl() {
-        try {
-            return HttpUrl.get(new URL(createBaseUrl() + "/analyze"));
-        } catch (MalformedURLException e) {
-            throw new IllegalArgumentException("Malformed url produced with following API Settings = " + apiSettings.toString());
-        }
+    private RequestBody createImageBody(byte[] image) {
+        return new MultipartBody.Builder()
+                .addPart(
+                        RequestBody.create(MediaType.parse("multipart/form-data"), image)
+                )
+                .build();
+    }
+
+    private RequestBody createUrlbody(String url) throws JsonProcessingException {
+        return RequestBody.create(MediaType.parse("application/json"), Mapper.getInstance().write(new UrlRequest(url)));
     }
 }

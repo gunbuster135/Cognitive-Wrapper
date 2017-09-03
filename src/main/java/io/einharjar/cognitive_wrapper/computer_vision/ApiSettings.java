@@ -8,6 +8,6 @@ import lombok.NonNull;
 @AllArgsConstructor
 public class ApiSettings {
     private @NonNull String location;
-    private String version;
+    private @NonNull String version;
     private @NonNull String apiKey;
 }

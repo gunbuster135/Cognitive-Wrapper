@@ -3,6 +3,7 @@ package io.einharjar.cognitive_wrapper.computer_vision;
 import io.einharjar.cognitive_wrapper.computer_vision.error.ApiException;
 import io.einharjar.cognitive_wrapper.computer_vision.error.ResponseError;
 import io.einharjar.cognitive_wrapper.computer_vision.request.VisionAnalyzeRequest;
+import io.einharjar.cognitive_wrapper.computer_vision.response.DescribeImageResponse;
 import io.einharjar.cognitive_wrapper.computer_vision.response.VisionAnalyzeResponse;
 import io.einharjar.cognitive_wrapper.utils.ImageHelper;
 import io.einharjar.cognitive_wrapper.utils.Mapper;
@@ -55,5 +56,38 @@ public class VisionClient {
             throw new ApiException(Mapper.getInstance().read(response.body().string(), ResponseError.class));
         }
         return new VisionAnalyzeResponse();
+    }
+
+    public DescribeImageResponse describeImage(int maxCandidates, BufferedImage image) throws IOException, ApiException {
+        return describeImage(maxCandidates, ImageHelper.readImage(image));
+    }
+
+
+    public DescribeImageResponse describeImage(int maxCandidates, File image) throws IOException, ApiException {
+        return describeImage(maxCandidates, ImageHelper.readImage(image));
+    }
+
+    public DescribeImageResponse describeImage(int maxCandidates, byte[] image) throws ApiException, IOException {
+        Response response = client.newCall(visionRequests.describeRequest(maxCandidates, image)).execute();
+        if (response.isSuccessful() && response.body() != null) {
+            return Mapper.getInstance().read(response.body().string(), DescribeImageResponse.class);
+        } else if (response.code() == 400 || response.code() == 415 || response.code() == 500) {
+            throw new ApiException(Mapper.getInstance().read(response.body().string(), ResponseError.class));
+        }
+        return new DescribeImageResponse();
+    }
+
+    public DescribeImageResponse describeImage(int maxCandidates, URL url) throws IOException, ApiException {
+        return describeImage(maxCandidates, url.toString());
+    }
+
+    public DescribeImageResponse describeImage(int maxCandidates, String url) throws IOException, ApiException {
+        Response response = client.newCall(visionRequests.describeRequest(maxCandidates, url)).execute();
+        if (response.isSuccessful() && response.body() != null) {
+            return Mapper.getInstance().read(response.body().string(), DescribeImageResponse.class);
+        } else if (response.code() == 400 || response.code() == 415 || response.code() == 500) {
+            throw new ApiException(Mapper.getInstance().read(response.body().string(), ResponseError.class));
+        }
+        return new DescribeImageResponse();
     }
 }
