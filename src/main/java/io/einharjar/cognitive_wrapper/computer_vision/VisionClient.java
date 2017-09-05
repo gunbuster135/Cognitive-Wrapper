@@ -39,8 +39,9 @@ public class VisionClient {
     }
 
     public VisionAnalyzeResponse imageAnalyze(VisionAnalyzeRequest request, byte[] image) throws ApiException, IOException {
-        Response response = client.newCall(analyzeRequest(request, image, apiSettings)).execute();
-        return handleResponse(response, VisionAnalyzeResponse.class);
+        try (Response response = client.newCall(analyzeRequest(request, image, apiSettings)).execute()) {
+            return handleResponse(response, VisionAnalyzeResponse.class);
+        }
     }
 
     public VisionAnalyzeResponse imageAnalyze(VisionAnalyzeRequest request, URL url) throws IOException, ApiException {
@@ -48,8 +49,9 @@ public class VisionClient {
     }
 
     public VisionAnalyzeResponse imageAnalyze(VisionAnalyzeRequest request, String url) throws IOException, ApiException {
-        Response response = client.newCall(analyzeRequest(request, url, apiSettings)).execute();
-        return handleResponse(response, VisionAnalyzeResponse.class);
+        try (Response response = client.newCall(analyzeRequest(request, url, apiSettings)).execute()) {
+            return handleResponse(response, VisionAnalyzeResponse.class);
+        }
     }
 
     public DescribeImageResponse describeImage(int maxCandidates, BufferedImage image) throws IOException, ApiException {
@@ -71,8 +73,9 @@ public class VisionClient {
     }
 
     public DescribeImageResponse describeImage(int maxCandidates, String url) throws IOException, ApiException {
-        Response response = client.newCall(describeRequest(maxCandidates, url, apiSettings)).execute();
-        return handleResponse(response, DescribeImageResponse.class);
+        try (Response response = client.newCall(describeRequest(maxCandidates, url, apiSettings)).execute()) {
+            return handleResponse(response, DescribeImageResponse.class);
+        }
     }
 
 
