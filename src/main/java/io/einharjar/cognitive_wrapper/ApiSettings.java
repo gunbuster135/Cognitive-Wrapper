@@ -1,4 +1,4 @@
-package io.einharjar.cognitive_wrapper.computer_vision;
+package io.einharjar.cognitive_wrapper;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

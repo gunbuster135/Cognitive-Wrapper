@@ -1,6 +1,5 @@
 package io.einharjar.cognitive_wrapper;
 
-import io.einharjar.cognitive_wrapper.computer_vision.ApiSettings;
 import io.einharjar.cognitive_wrapper.computer_vision.VisionClient;
 import okhttp3.OkHttpClient;
 import java.net.MalformedURLException;
