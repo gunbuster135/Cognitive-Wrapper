@@ -75,8 +75,9 @@ public class VisionClient {
         return handleResponse(response, DescribeImageResponse.class);
     }
 
+
     //Generic response handler
-    private <T> T handleResponse(Response response, Class<T> responseClass) throws ApiException, IOException {
+    static <T> T handleResponse(Response response, Class<T> responseClass) throws ApiException, IOException {
         if (response.isSuccessful() && response.body() != null) {
             return Mapper.getInstance().read(response.body().string(), responseClass);
         } else if (response.code() == 400 || response.code() == 415 || response.code() == 500) {
